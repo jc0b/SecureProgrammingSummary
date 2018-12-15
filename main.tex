@@ -1,0 +1,149 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Secure Programming Summary}
+\author{j.s.burley }
+\date{November 2018}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+\section{Introduction}
+    \subsection{What is security?}
+    The state of being secure
+    \\CIA: \textbf{only} authorised actors can:
+    \begin{itemize}
+        \item Learn secrets (\textbf{Confidentiality})
+        \begin{itemize}
+            \item \textbf{Data Confidentiality}: make sure that private information is not available to unauthorised actors
+            \item \textbf{Privacy}: Individuals have control over what information is collected and stored, and how that information is shared
+        \end{itemize}
+        \item Modify messages/data (\textbf{Integrity})
+        \begin{itemize}
+            \item \textbf{Data Integrity}: Assures that information is modified only in a way that is known
+            \item \textbf{System Integrity}: Ensures that a system performs as designed, without unauthorised modification
+        \end{itemize}
+        \item Access messages/data (\textbf{Availability})
+        \begin{itemize}
+            \item \textbf{Availability}: ensures that service is provided to an acceptable level, without denying access to authorised users
+        \end{itemize}
+    \end{itemize}
+    Security is best \textbf{by design} - not as afterthought
+    \subsection{Identifying requirements for a secure protocol}
+    \begin{itemize}
+        \item Always work towards CIA protocols described above
+        \item We can do this by using the following three techniques
+        \begin{itemize}
+            \item Cryptographic algorithms to hide, sign and provide guarantees about messages
+            \item Use cryptography in protocols, systems in order to secure them
+            \item Program with security in mind in order to avoid exploits that may manipulate software
+        \end{itemize}
+        \item An additional requirement is \textbf{Non-repudiation}: One party of a transaction cannot deny having received a transaction, nor can the other party deny having sent the transaction.
+    \end{itemize}
+    Access Control
+    \begin{itemize}
+        \item \textbf{Identification}: A user states their identity (i.e. a username)
+        \item \textbf{Authentication}: The system verifies this identity (i.e. through a shared secret like a password)
+        \item \textbf{Authorisation}: This user is authorised to perform a particular task, or access a particular file
+        \end{itemize}
+\section{Cryptology}
+Cryptography: The mathematics of secret communication
+\\Cryptology: Includes study of breaking cryptographic protocols (known as cryptanalysis)
+\\The challenge of cryptology is to map mathematics of cryptosystems onto computers with the help of engineers
+\subsection{Basic Concepts}
+\textbf{Kerckhoff's Principle}: A cryptosystem should be secure \textit{even if} everything about the system, \textit{except the key} is public knowledge.
+\\There is no "Security by obscurity": all crypto algorithms are assumed to be known. Security is based on:
+\begin{itemize}
+    \item Secrecy of the key
+    \item Hard to infer the plaintext from the cipher text
+\end{itemize}
+\textbf{Cryptanalysis} is inferring the plaintext from ciphertext \textit{without} knowing the key.
+\subsection{Examples of ciphers}
+\subsubsection{Caesar Cipher}
+\begin{itemize}
+    \item Monoalphabetic substitution cipher
+    \item Key is a constant shift (i.e. 5 letters)
+    \item We encrypt by shifting each message letter by $key$ letters (AAA -> FFF)
+    \item ROT13 is least secure variant of this: shift by 13 letters. ROT13 is its own inverse
+\end{itemize}
+It is easy to break monoalphabetic substitution ciphers using techniques like frequency analysis of the most common letters in a given language. We can then perform frequency analysis on the message to determine if there is a letter that matches the frequency of one in the message language.
+\subsubsection{Vigenére Cipher}
+\begin{itemize}
+    \item Polyalphabetic substitution cipher
+    \item We use a table called a \textit{tabula recta}
+    \item Has multiple keys
+    \item Repeat the keys for the length of the message, use the table to determine which letter to substitute
+\end{itemize}
+We can break polyalphabetic ciphers by breaking the message into components and grouping ciphertexts into parts corresponding to each key character. We can then use frequency analysis on each of these message components.
+\subsubsection{One Time Pad}
+\begin{itemize}
+    \item Takes concept of Vigenére to the extreme
+    \item Key size = plaintext size (or larger) in order to avoid repeated patterns
+    \item Only known algorithm with perfect secrecy
+    \item Key distribution is a problem (have to keep key secret, prevent interception)
+    \item If random key is never re-used as a whole or in part, and kept completely secret, impossible to use cryptanalysis to break it.
+\end{itemize}
+\subsubsection{Block ciphers}
+With the above methods, we treat messages as a one-dimensional stream, and we either substitute or shift letters to encrypt. With \textbf{Block Ciphers}, we include transpositions.
+\subsubsection{Playfair Cipher}
+\begin{itemize}
+    \item simple block cipher from 1854 (unsafe nowadays)
+    \item Key is a 5x5 matrix with the keyphrase (we replace I with J so the alphabet fits)
+    \item encrypt messages in digrams (two letter pairs)
+    \item pad the message if a digram is incomplete, or if a digram consists of two of the same letter (X is a common padding letter)
+\end{itemize}
+Rules of playfair:
+\begin{enumerate}
+    \item If two letters are in the same row or column, replace by shifting the letter to the right (row) or down (column). Use wrap around if there is no letter directly to the right of a chosen letter.
+    \item Otherwise, picture a rectangle formed by the two letters. Replace the letters with those at the two "unoccupied" corners of that rectangle. The order for this is important: first letter of ciphertext pair must come from the same \textbf{row} as the first letter of the plaintext pair.
+\end{enumerate}
+
+
+\subsection{Symmetric Encryption}
+\subsubsection{Symmetric Ciphers}
+\begin{itemize}
+    \item relatively fast
+    \item One key to encrypt and decrypt
+    \item block vs stream variants
+    \item has a major weakness: \textbf{key distribution}
+\end{itemize}
+\subsubsection{Modern Symmetric Ciphers}
+\begin{itemize}
+    \item DES, 3DES, AES (AES most dominant, DES broken)
+    \item based on substitution and transposition
+    \item too complex to do by hand
+    \item block ciphers (DES, 3DES, AES,...)
+    \item also stream ciphers, the most well known being RC4
+\end{itemize}
+\subsubsection{Block vs Stream}
+\begin{itemize}
+    \item Block ciphers: block of plaintext treated as a whole and produces a ciphertext block (typically of equal length). Typical length is 64 or 128 bits. Achieved using substitution and transposition. Diffusion \& confusion
+    \item Stream ciphers: encrypts a digital data stream 1 bit/byte at a time, no regard for padding or length
+\end{itemize}
+\subsubsection{Diffusion vs Confusion}
+\begin{itemize}
+    \item diffusion: each plaintext digit affects the value of many ciphertext digits with a cascade effect
+    \item confusion: statistics of ciphertext and value of the encryption key are as complex as possible
+\end{itemize}
+\subsubsection{Transposition cipher}
+Permutation over a block of plaintext.
+\begin{verbatim}
+    Key:        4312567
+    Plaintext:  attackp
+                ostpone
+                duntilt
+                woamxyz
+\end{verbatim}
+If you read the characters column-wise in the order provided by the key, you get the following message:
+\begin{verbatim}
+    ttna aptm tsuo aodw coix knly petz
+\end{verbatim}
+Putting this together, we get the nonsense string:
+\begin{verbatim}
+    ttnaaptmtsuoaodwcoixknlypetz
+\end{verbatim}
+
+\end{document}
