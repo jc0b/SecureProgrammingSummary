@@ -111,6 +111,11 @@ Rules of playfair:
     \item has a major weakness: \textbf{key distribution}
 \end{itemize}
 \subsubsection{Modern Symmetric Ciphers}
+Typically injective (one-to-one) to allow for decryption
+\\Vulnerable to statistical attacks, as small blocks can only take limited transformations
+\\large blocks are impractical
+\\Key size can grow quite large: 4 bits x 16 rows
+\\in general, n x $2^n$, so a 64-bit block would require a key of 64 x $2^64 = 10^21$ bits (125 Exabytes, 125,000 petabytes)
 \begin{itemize}
     \item DES, 3DES, AES (AES most dominant, DES broken)
     \item based on substitution and transposition
