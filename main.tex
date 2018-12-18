@@ -223,5 +223,92 @@ It also has some useful features
     $$C = E(M,P_{pu})$$
     $$M = D(M,P_{pr})$$
     Where C is ciphertext, M is message, and E and D are decrypt with P as the public and private key
+    \item can also be used for authentication using a combination of pubkey/privkey encryption/decryption
+    $$C' = E(M,P^{A}_{pu})$$
+    $$C = E(M||C',P^{B}_{pu})$$
 \end{itemize}
+\subsection{Characteristics}
+pubkey algorithms rely on two keys where:
+\begin{itemize}
+    \item its computationally infeasible to find decryption key knowing only algorithm and encryption key
+    \item computationally easy to en/de-crypt messages when relevant key is known
+    \item (for some algorithms) either key can be used to encrypt, with private required to decrypt
+\end{itemize}
+\subsection{RSA}
+by Rivest, Shamir and Adleman of MIT in 1977
+\\best known, most widely used pubkey scheme
+\\based on exponentiation in a finite (Galois) field over integers modulo a prime (exponentation takes $O((log n)^3)$ operations, computationally easy)
+\\uses large (1024 bits) integers
+\\security through cost of factoring large numbers (factorization takes $O(e^{log n log n log n}$ operations, computationally hard)
+\subsubsection{Setting up an RSA key}
+Each user must generate a public/private key pair by:
+\begin{itemize}
+    \item Selecting two large primes at random - $p, q$
+    \item compute their modulus $n=p\times q$, where $\phi(n)=(p-1)(q-1)$ \footnote{$\phi(n)$ being Euler's totient function: the number of integers $1 \leq k \leq n$ that are relatively prime to $n$}
+    \item select at random the encryption key $e$ where $1 < \phi(n)$, $gcd(e,\phi(n)) = 1$
+    \item solve the following equation to find decryption key $d$: $e \times d = 1 mod \phi(n)$ and $0<d<\phi(n)$
+\end{itemize}
+Users publish their encryption key: $PU ={e,n}$
+\\Users keep private decryption key secret: $PR={d,n}$
+\subsubsection{RSA usage}
+To \textbf{encrypt} a message M, the sender:
+\begin{itemize}
+    \item Obtains the \textbf{public key} of recipient $PU$
+    \item Computes: $C=M^e mod n$, where $0\leq M < n$
+\end{itemize}
+To decrypt the ciphertext C, the receiver:
+\begin{itemize}
+    \item uses their \textbf{private key} $PR={d,n}$
+    \item computes: $M = C^d mod n$
+\end{itemize}
+\textit{note: message M must be smaller than modulus n (split message into blocks if necessary)}
+\subsubsection{Why does RSA work like this?}
+\textbf{Euler's totient function}
+Expressed as $\phi(n)$ or $\varphi(n)$
+\\Defined as the number of positive integers less than n and relatively prime to n
+\\$\varphi(1) = 1$
+\\Given that $n=pq$, and $p$ and $q$ are prime numbers:
+$$\varphi(n)=\varphi(pq)=\varphi(p)\varphi(q)=(p-1)(q-1)$$
+\textbf{Euler's theorem}
+$\alpha, n$ relative prime: the only positive integer that evenly divides both is 1
+$$\alpha^{\phi(n)}\equiv 1(mod n)$$
+\textbf{So why does RSA work?}
+Because of Euler's theorem:
+$$a^{\phi(n)}mod n = 1$$ where $gcd(a,n)=1$
+\\in RSA we have:
+$$n=p\times q$$
+$$\phi(n)=(p-1)(q-1)$$
+we carefully choose $e$ and $d$ to be inverses $mod\phi(n)$
+\\so, $e\times d = 1+k \times \phi(n)$ for some $k$
+\\hence:
+$$C^d = M^{e\times d} = M^{1+k\times \phi(n)} = M^1 \times (M^{\phi(n)})^k$$
+$$= M^1 \times (1)^k = M^1 = M mod n$$
+\subsubsection{Practical considerations}
+Messages need to be prepared/encoded
+\\Plaintext message units: all blocks of $k$ length, regarded as k-digit base n integers (i.e. we assign them numerical equivalents between $0$ and $N^k$)
+\\Ciphertext message units: blocks of $\ell$ letters in our N-letter alphabet.
+\subsubsection{RSA security}
+There are some ways we could try and attack RSA:
+\begin{itemize}
+    \item brute force key search (infeasible given size of numbers)
+    \item mathematical attacks (based on difficulty of computing $\phi(n)$, by factoring modulus n)
+    \item timing attacks (on running of decryption)
+    \item \textbf{chosen ciphertext attacks (given properties of RSA)}
+\end{itemize}
+\subsubsection{RSA factoring problem}
+3 forms of mathematical approach
+\begin{itemize}
+    \item factor $n=p\times q$, hence computing $\phi(n)$ and then $d$
+    \item determine $\phi(n)$ directly and compute $d$
+    \item find $d$ directly
+\end{itemize}
+Currently, it is believed all attacks use factoring
+\\Slow improvements over the years
+\\As of 05/05/2017, keys of 200 decimal digits (663 bits) have been broken
+\\We currently assume 1024-2048 bit RSA is secure (assuming p and q of a similiar size and matching other constraints)
+\subsubsection{Chosen Ciphertext Attacks as a way to break RSA}
+RSA is vulnerable to CCA
+\\Assume an oracle where the attacker can choose a ciphertext and get a decrypted plaintext back
+\\Choose ciphertext to exploit properties of RSA to provide info to help cryptanalysis
+\\Can counter with random pad of plaintext, or use \textbf{Optimal Asymmetric Encryption Padding} (OASP)
 \end{document}
