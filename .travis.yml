@@ -22,3 +22,13 @@ deploy:
   skip_cleanup: true
   on:
     repo: jc0b/SecureProgrammingSummary
+
+#discord channel integration, I should probably mirror this sh file somewhere just in case    
+after_success:
+  - wget http://assets.jacobsburley.com/send.sh
+  - chmod +x send.sh
+  - ./send.sh success $WEBHOOK_URL
+after_failure:
+  - wget http://assets.jacobsburley.com/send.sh
+  - chmod +x send.sh
+  - ./send.sh failure $WEBHOOK_URL
