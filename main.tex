@@ -150,5 +150,78 @@ Putting this together, we get the nonsense string:
 \begin{verbatim}
     ttnaaptmtsuoaodwcoixknlypetz
 \end{verbatim}
-
+\subsubsection{Feistel Cipher}
+\begin{itemize}
+    \item Goal: approximate ideal cipher and reduce statistical properties linking plaintext, ciphertext and keys
+    \item Combining substitutions and permutations: each plaintext element or group of elements is uniquely replaced by a corresponding ciphertext element or group of elements, and a sequence of plaintext elements is replaced by a permutation of that sequence. No elements are added or deleted or replaced in the sequence, but the order of the elements in the sequence is changed.
+\end{itemize}
+\textbf{Substitution:} right part of plaintext block transformed by F(Ki) and XORed with left part
+\\\textbf{Permutation:} right part swapped with left part
+\\Relationship between the $i^{th}$ round and the output of the previous round given by:
+$$L_i = R_{i-1}$$
+$$R_i = L_{i-1}\bigoplus f(K_i, R_{i-1})$$
+where $f$ is called the Feistel function.
+\textbf{Properties}
+\begin{itemize}
+    \item \textbf{Block size:} larger blocks mean greater security but lower encrypt/decrypt speed. Block size of 64 is a reasonable tradeoff, AES uses 128
+    \item \textbf{Key size:} larger key = greater security but reduced encrypt/decrypt speed. 64-bit key size is considered inadequate, 128bits common
+    \item \textbf{Number of rounds:} essence of feistel cipher is that a single round is not secure enough, multiple rounds increase security. 16 rounds is typical
+    \item \textbf{Round key generation algorithm:} greater complexity in this algorithm -> greater difficulty of cryptanalysis
+    \item \textbf{Round function F:} greater complexity in this algorithm -> greater difficulty of cryptanalysis
+\end{itemize}
+\textbf{Extra (desired) properties}
+\begin{itemize}
+    \item \textbf{Fast software encryption/decryption:} encryption is often embedded in applications or utility functions to avoid a hardware implementation
+    \item \textbf{ease of analysis:} If algorithm is easier to analyze, it is easier to find (cryptanalytic) vulnerabilities and strengthen algorithm. (i.e. DES is not easily analyzed)
+\end{itemize}
+\textbf{Block modes}
+\\\textbf{Electronic codebook (ECB)}
+\begin{itemize}
+    \item each block is encoded independently using the same key
+    \item used for: secure transmission of single blocks (i.e. an encryption key)
+    \item \textbf{identical blocks can leak information or lead to attacks!}
+\end{itemize}
+\textbf{Cipher Block Chaining (CBC)}
+\begin{itemize}
+    \item input to the encryption algorithm is the XOR of the next 64 bits of plaintext and the preceding 64 bits of ciphertext
+    \item used for: general purpose block-oriented transmission
+    \item Requires initialization vector (IV) to XOR with the first plaintext block
+\end{itemize}
+There are others: PCBC, CFB, OFB, CTR.
+\\\textbf{Choosing the wrong block mode is a major factor in implementation weaknesses}
+\subsubsection{DES}
+\begin{itemize}
+    \item 64 bit block size
+    \item key length is 56 bits, with 8 bits for parity (64 bits total)
+    \item 16 round feistel structure
+\end{itemize}
+\subsubsection{AES}
+\begin{itemize}
+    \item subset of \textit{Rijndael}, developed in 1998 by two belgian cryptographers John Daemen and Vincent Rijmen
+    \item most widely used symmetric cipher today
+    \item 128 bit block size
+    \item 128, 192 or 256 bit key size
+\end{itemize}
+\section{Public Key Crypto Systems}
+\begin{itemize}
+    \item public-key/two-key/asymmetric crypto involves the use of two keys
+    \item \textbf{public key:} may be known to anyone, and can be used to encrypt messages and verify signatures
+    \item \textbf{private key:} known only to the recipient, used to decrypt messages and create signatures
+    \item \textbf{asymmetric because:} encryptors and verifiers cannot decrypt or create signatures
+    \item {PKCS: Public Key Crypto Standards}
+\end{itemize}
+\subsection{Why do we use it?}
+Addresses two key issues:
+\begin{itemize}
+    \item \textbf{Key distribution:} how to have secure communications in general without having to trust the channel when transmitting symmetric key
+    \item \textbf{digital signatures:} how do we verify a message comes (intact) from the claimed sender?
+    \item Publicly invented by Whitfield Diffie and Martin Hellman in 1976, although existence of concept was known prior
+\end{itemize}
+It also has some useful features
+\begin{itemize}
+    \item can be used to transmit message securely
+    $$C = E(M,P_{pu})$$
+    $$M = D(M,P_{pr})$$
+    Where C is ciphertext, M is message, and E and D are decrypt with P as the public and private key
+\end{itemize}
 \end{document}
