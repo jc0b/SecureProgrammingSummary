@@ -486,7 +486,7 @@ SSH uses several crypto primitives:
     \item client and server begin DH key exchange and generate a session key
     \item each message must contain a MAC to verify packet integrity
     \begin{itemize}
-        \item this MAC is calculated from the shared secret, the packet seq#, and the actual message contents
+        \item this MAC is calculated from the shared secret, the packet seq\#, and the actual message contents
     \end{itemize}
 \end{enumerate}
 \subsection{User authentication}
@@ -495,7 +495,7 @@ SSH uses several crypto primitives:
     \item public-key based (recommended!)
     \begin{itemize}
         \item user sends public key to server
-        \item it is saved in \~/.ssh/authorised_keys file serverside
+        \item it is saved in ~/.ssh/authorised\_keys file serverside
         \item now user can log in without password, using their private key to authenticate
     \end{itemize}
 \end{itemize}
