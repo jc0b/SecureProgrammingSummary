@@ -691,4 +691,145 @@ Windows PE and Linux ELF file formats
     \item executed code and data of needed shared libraries (dynamically loaded into the space)
     \item program stack (temporary storage used by functions)
 \end{itemize}
+\section{Application Security}
+\subsection{Assembly}
+\begin{itemize}
+    \item low-level symbolic language
+    \item processor-specific due to availability of instructions
+    \item directly translated into machine language
+    \item we focus on \textbf{user-mode x86-64 assembly} which is used by most PCs
+    \item We use AT\&T syntax for assembly (intel swaps param order)
+\end{itemize}
+Program composed of:
+\begin{itemize}
+    \item instructions
+    \item directives: assembler commands
+    \item labels: create symbol at current address
+    \item comments: text after \# is ignored
+\end{itemize}
+Assembly instructions:
+\begin{itemize}
+    \item general form of \textit{mnemonic source, destination} (in AT\&T syntax)
+    \item \textbf{mnemonic} is a shortcode telling cpu what to do e.g. mov, jump
+    \item source and destination are operands. They can be \textbf{registers}, \textbf{memory addresses}, or \textbf{constants} (for source arguments: obviously a destination cannot be a constant)
+    \item the number and type of operands varies per instructions. There may be fewer operands than two and (rarely) may be more. Operands may be implicit. At most one explicit memory operand is allowed.
+\end{itemize}
+\subsubsection{Registers}
+\begin{itemize}
+    \item memory locations on CPU itself
+    \item general purpose (\verb|\%rax, \%rbx, \%rcx, \%rdx, \%rsi, \%rdi, \%r8-\%r15|)
+    \item stack pointer \verb|\%rsp|
+    \item frame pointer \verb|\%rbp|
+    \item instruction pointer \verb|\%rip|
+    \item flags register
+    \item segment registers, rarely used in 64-bit
+    \item system registers, only used in kernel
+    \item instruction set registers, only used with special instructions
+\end{itemize}
+Default registers are 64-bit, but smaller parts can be used if the whole 64-bits is not necessary
+\\Setting 32-bit sub registers clears the other bits, but setting smaller sub-registers retains the other bits
+\subsubsection{Memory}
+\begin{itemize}
+    \item memory is accessed by \textbf{dereferencing} pointers
+    \begin{itemize}
+        \item \textit{displacement(base, index, scale)}
+        \item refers to \textit{displacement+base+index*scale}, where base and index are 64-bit registers and displacement is a 32-bit constant or symbol (default = 0)
+        \item scale = 1, 2, 4,or 8 (default = 1)
+        \item all parts are optional
+        \item alternatively, base can be \verb|\%rip| (address of next instruction) if index is omitted, in which case sumbolic displacement will be relative to that address
+    \end{itemize}
+    \item Operand size specified as suffix to mnemonic
+    \begin{itemize}
+        \item b for byte, w for word (16-bits), l for long (32-bits) q for quad (64 bits)
+        \item optional if other operand is a register
+    \end{itemize}
+\end{itemize}
+\subsection{Endianess and Signed integers}
+\begin{itemize}
+    \item Intel uses little endian ordering
+    \item signed integers expressed in twos complement notation
+    \item sign is changed by flipping bits and adding one, ignoring overflow
+\end{itemize}
+\subsubsection{Common Instructions}
+\textbf{Data transfer:}
+\\\verb|mov src, dest| dst = src
+\\\verb|xchg dst1, dst2| swap dst1 and dst2
+\\\verb|push src| store src on top of stack
+\\\verb|pop dst| retrieve top of stack into dst
+\\\textbf{Binary Arithmetic:}
+\\\verb|add src, dst| dst += src
+\\\verb|sub src, dst| dst -= src
+\\\verb|inc dst| dst++
+\\\verb|dec dst| dst--
+\\\verb|neg dst| dst = -dst
+\\\verb|cmp src1, src2| set flags based on the result of src2 - src1
+\\\textbf{Logical}
+\\\verb|and src, dst| dst \&= src
+\\\verb|or src, dst| dst |= src
+\\\verb|xor dst, src| dst $^ =$ src
+\\\verb|not dst| dst = $\tilde{}$ dst
+\\\verb|test src1, src2| set flags based on src1 \& src2
+\\\textbf{Unconditional Branches}
+\\\verb|jmp addr| jump to addr
+\\\verb|call addr| push return address to stack, then call function (at) addr
+\\\verb|ret| pop return address and return there 
+\\\verb|syscall| enter the kernel to perform a system call
+\\\textbf{Miscellaneous}
+\\\verb|lea src, dst| dst = \&src (src must be in memory)
+\\\verb|nop| do nothing
+
+\subsubsection{Conditional Branches}
+general form: \verb|jcc addr|
+\\jumps to addr only if condition cc holds, decided using flags register which is implicitly set by arithmetic and logical instructions
+\textbf{Common choices for condition code cc}
+\begin{itemize}
+    \item e/z equal/zero result = 0
+    \item b below dst $<$ src (unsigned)
+    \item a above dst $>$ src (unsigned)
+    \item l less dst $<$ src (signed)
+    \item g dst $>$ src (signed)
+    \item s sign result $<$ 0 (signed)
+    \item ncc not test for opposite condition
+\end{itemize}
+\subsubsection{Data definition}
+Data objects defined in a data segment using syntax
+\\\verb|label:      .type        data1, data2, ...|
+
+\subsection{Stack Frames}
+\subsubsection{The stack}
+The stack grows towards \textbf{lower memory addresses}, with stack pointer \verb|\%rsp| pointing to top of stack
+\\The stack is composed of \textbf{frames}, which are pushed onto the stack as a consequence of a function call. The address of the current frame is stored in the frame pointer (FP) register, which is \verb|\%rbp| on intel architectures.
+\\Each frame contains:
+\begin{itemize}
+    \item the functions actual parameters if they are not in registers
+    \item the return address to jump back to at the end of the function
+    \item the pointer to the previous frame
+    \item the functions local variables
+\end{itemize}
+\textbf{Compiler optimization may eliminate stack frames!}
+\subsubsection{Parameter passing in caller function}
+(In Linux, specifically)
+\begin{itemize}
+    \item Before calling a function, caller prepares params by either setting specific registers or pushing them to stack (so they are not lost when new stack elements are pushed if they are top of stack)
+    \item Store as many ints, pointers and small structs as possible in registers. The following registers are used for this from left to right: \verb|\%rdi \%rsi, \%rdx, \%rdx, %\r8, \%r9|
+    \item most other params (with the exception of floats) are pushed onto the stack from right to left
+\end{itemize}
+\subsubsection{Prologue in calling function}
+\begin{itemize}
+    \item push the old base pointer onto the stack \verb|\%rbp|
+    \item set the base pointer to be the current stack pointer \verb|\%rsp|
+    \item move the stack pointer to make room for local variables
+    \item we have an \verb|enter| opcode for these operations, but it does \textbf{not} push preserved registers
+\end{itemize}
+\subsubsection{Epilogue in calling function}
+\begin{enumerate}
+    \item save the result (if there is one) in \verb|\%rax|
+    \item restore old stack pointer from base pointer, deleting current stack frame
+    \item restore registers that must be preserved for the caller from the stack
+    \item restore base pointer from stack
+    \item executes a \verb|ret|
+    \item \verb|leave| opcode is a shorthand for operations two and four, but does \textbf{not} restore preserved registers
+\end{enumerate}
+\section{Exploitation Techniques in Application Security}
+\subsection{Buffer Overflows}
 \end{document}
