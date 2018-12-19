@@ -586,5 +586,19 @@ SSL Session:
 \begin{itemize}
     \item one of 3 SSL specific protocols which use the SSL record protocol
     \item single message consists of just one byte: 1
-    \item causes pending state to become current
+    \item causes pending state to become current, updating cipher suite in use
+    \item sent after just-negotiated cipherspec and keys
+\end{itemize}
+\subsection{SSL Alert Protocol}
+\begin{itemize}
+    \item conveys SSL-related alerts to peer entity
+    \item 2 byte messages
+    \item severity indicated in the first byte (warning or fatal)
+    \item specific alert in the second byte
+    \begin{itemize}
+        \item fatal: unexpected message, bad record mac, decompression failure, handshake failure, illegal parameter
+        \item warning: close notify, no cert, bad cert, unsupported cert, cert revoked, cert expired, cert unknown
+    \end{itemize}
+    \item compressed and encrypted like all SSL data
+\end{itemize}
 \end{document}
