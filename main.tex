@@ -542,7 +542,7 @@ SSH uses several crypto primitives:
     \end{enumerate}
     \item Handshake for session init, record for data transfer, alert for message passing, change cipher for changing crypto method
 \end{itemize}
-%SSL STACK IMAGE HERE
+\includegraphics[width= 250pt]{sslstack.png}
 SSL Connection:
 \begin{itemize}
     \item transient, p2p communications link associated with 1 SSL \textbf{session}
@@ -581,7 +581,7 @@ SSL Session:
     \item AES, IDEA, RC2-40, DES-40, DES, 3DES, Fortezza, RC4-40, RC4-128
     \item message is optionally compressed before encryption
 \end{itemize}
-%include image from lec9slide13
+\includegraphics[width= 250pt]{sslblock.png}
 \subsection{SSL Change Cipher Spec Protocol}
 \begin{itemize}
     \item one of 3 SSL specific protocols which use the SSL record protocol
@@ -613,7 +613,7 @@ SSL Session:
     \end{enumerate}
 \end{itemize}
 Format of these messages
-%insert image here lec9slide17
+\includegraphics[width= 250pt]{sslHP.png}
 \begin{itemize}
     \item Type (1 byte): indicates one of 10 messages
     \item Length (3 bytes): the length of the message in bytes
@@ -629,5 +629,66 @@ IETF standard RFC 2246 similiar to SSLv3, but with minor differences
     \item some changes in supported ciphers
     \item changes in cert types and negotiations
     \item changes in crypto computations and padding strategy
+\end{itemize}
+\section{Systems Security}
+\textbf{Computer Security:} Prevent attackers from doing things with unauthorised access to computers and/or networks
+\\\textbf{Programmer:} make sure source code is correct, secure and performs well
+\\\textbf{System integrator:} responsible for integrating new and existing software to create programs or systems to satisfy customer requirements
+\\\textbf{Sysadmins:} responsible for managing and securing one or more systems. Installing, updating and removing software and managing system privileges
+\\\textbf{Network Admins:} manage (secure) network operations
+\\\textbf{Security Analyst:} concerned with properties of security flaws and how to identify them
+\\\textbf{Vulnerability Analyst:} analyses vulnerablities in existing programs
+\\\textbf{Security Researcher:} develops exploits and mitigation strategies for those exploits
+\\\textbf{Attacker:} malicous, exploits vulnerabilities to achieve a goal. These goals vary depending on threat
+\\\textbf{Security Policy:} A set of rules and practices that specify how an organisation or system secures sensitive and critical (system) resources
+\\\textbf{Software defect:} encoding of human error in software
+\\\textbf{Security flaw:} software defect that poses a \textbf{security risk}. If we eliminate software defects, we can eliminate security flaws
+\\\textbf{Weakness:} a type of behaviour that has potential to allow an attacker to violate a security policy if the behaviour is accessible to the attacker
+\\\textbf{Vulnerability:} set of conditions that allow an attacker to violate an explicit or implicit security policy. Not all security flaws lead to vulnerabilities, but they can cause a program to be vulnerable. Vulnerabilities can exist without a security flaw (i.e., Rowhammer uses a physical vulnerability). Composed of one or more (related) weaknesses that allow an actor to access things that would otherwise be inaccessible to them. Intersection of three elements: system flaw, attacker access to flaw, attacker capability to exploit flaw.
+\\\textbf{Exploit:} piece of software or a technique that takes advantage of a vulnerability to violate an explicit/implicit security policy. Failed exploits could crash software/a system. Proof-of-concept exploits are developed to prove existence of vulnerability, and are beneficial so long as they don't leak/fall into wrong hands.
+\\\textbf{Mitigation:} methods of preventing or limiting exploits, protecting against vulnerabilities. Can range from code improvements to infrastructure changes (e.g. not using strcpy to closing ports on router)
+
+\subsection{Vulnerability Detection}
+Automated detection is an unsolved problem, but there are approaches to try and approximate this
+\begin{itemize}
+    \item \textbf{taint analysis:} track user data through program and see whether it passes through dangerous places
+    \item \textbf{Fuzzing:} test the program with lots of inputs at program and see if one breaks it/exposes a vulnerability
+\end{itemize}
+The above approaches are incomplete at best
+\subsection{C and C++}
+\begin{itemize}
+    \item popular
+    \item composes vast majority of reported vulnerabilities
+    \item does not protect programmers. problems arise from poor understanding of how abstractions translate to machine instructions
+    \item no type safety, doesn't protect against things like writing over the boundaries of an array
+    \item Legacy code written before mainstream standardization of C is still pervasive, and is at higher risk for security flaws because of looser compiler standards
+\end{itemize}
+\textbf{Short term solutions}
+\begin{itemize}
+    \item educate developers to program securely and apply appropriate mitigations
+\end{itemize}
+\textbf{Long term solutions}
+\begin{itemize}
+    \item language standard, compilers and tools evolve
+    \item replace these languages? Unlikely to happen, system software relies on high performance of these languages
+\end{itemize}
+Adopting languages like Java not viable because of:
+\begin{itemize}
+    \item existing investment in C
+    \item programming expertise
+    \item development environments
+    \item performance (java can have a lot of overhead)
+    \item closeness to hardware allows for better performance
+\end{itemize}
+\subsection{Typical Memory Layout of a program}
+Windows PE and Linux ELF file formats
+\\Main segments of binary program:
+\begin{itemize}
+    \item executable code (text/code)
+    \item initialized data (data)
+    \item uninitialized data (bss)
+    \item heap (dynamic memory allocation)
+    \item executed code and data of needed shared libraries (dynamically loaded into the space)
+    \item program stack (temporary storage used by functions)
 \end{itemize}
 \end{document}
