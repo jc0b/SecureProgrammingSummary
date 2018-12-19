@@ -311,4 +311,65 @@ RSA is vulnerable to CCA
 \\Assume an oracle where the attacker can choose a ciphertext and get a decrypted plaintext back
 \\Choose ciphertext to exploit properties of RSA to provide info to help cryptanalysis
 \\Can counter with random pad of plaintext, or use \textbf{Optimal Asymmetric Encryption Padding} (OASP)
+\section{Key Management}
+Public key encryption helps address key distribution problems
+\\There are two aspects to key distribution involving public keys:
+\begin{itemize}
+    \item distribution of the public keys themselves
+    \item Using Public Key Encryption to distribute secret (symmetric) keys
+\end{itemize}
+\subsection{Distribution of Public Keys}
+We can use:
+\begin{itemize}
+    \item public announcement
+    \item publicly available directory
+    \item \textbf{public-key authority}
+    \item \textbf{public-key certificates}
+\end{itemize}
+\subsubsection{Public-Key Authority}
+\begin{itemize}
+    \item improve security by tighetning control over distribution of keys from a directory, meaning that a user has to register with the directory
+    \item requires uses to know the public-key for the directory
+    \item then, users interact with directory to obtain any desired public key in a secure manner. Real time access to the directory is required when keys are needed
+\end{itemize}
+%TODO: insert image here
+\subsubsection{Public-key certificates}
+\begin{itemize}
+    \item allow key exchange without real-time access to PKA
+    \item certificate binds identity to public key (usually with other info e.g. period of validity)
+    \item all contents \textbf{signed} by a trusted PKA or Certificate Authority (i.e. Verisign)
+    \item Can be verified by anyone who knows that PKA's public key
+\end{itemize}
+%TODO insert image here for PKC
+\subsubsection{Public-key distribution of secret keys}
+\begin{itemize}
+    \item use previous methods to obtain public-key
+    \item can use for secrecy or authentication
+    \item but, public-key algorithms are slow
+    \item usually we want symmetric key encryption to protect message contents, so we need a session key
+    \item there are several alternatives for negotiating a suitable session
+\end{itemize}
+\subsubsection{Diffie-Hellman Key Exchange}
+\begin{itemize}
+    \item was the first public-key type scheme proposed by Diffie \& Hellman in 1976
+    \item practical method for public exchange of a secret key
+    \item used in a number of commercial products
+    \item public key distribution scheme cannot be used to exchange an arbitrary message, but can be used to establish a common secret key between two participants
+    \item key value depends on participants and their priv/pub key information
+    \item based on exponentiation in a finite (Galois) field (modulo a prime or polynomial, easy)
+    \item security relies on difficulty of computing discrete logarithms (similar to factoring) - hard
+\end{itemize}
+How do we set up D-H?
+\begin{itemize}
+    \item both users agree on global parameters: large prime int or polynomial $q$, $a$ being a primitive root modulo $q$
+    \item $a$ and $q$ can be transmitted in the clear
+    \item each user then generates their key, by choosing a secret key (number): $x_A < q$, and computing their \textbf{public key:} $y_A = a^{x_A} mod q$
+    \item each user then publicises their $y_A$
+    \item the shared session key for two users A and B is $K_{AB}$
+    $$K = a^{x_A + x_B} mod q$$
+    $$= y_{A}^{x_B} mod q$$ (which B can compute)
+    $$= y_{B}^{x_A} mod q$$ (which A can compute)
+    \item $K$ is used as a session key in symmetric encryption scheme between Alice and Bob
+    \item attacker needs an $x$ (secret key), must solve discrete logarithm problem 
+\end{itemize}
 \end{document}
