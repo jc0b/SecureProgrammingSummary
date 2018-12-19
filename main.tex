@@ -14,43 +14,43 @@
 \tableofcontents
 \newpage
 \section{Introduction}
-    \subsection{What is security?}
-    The state of being secure
-    \\CIA: \textbf{only} authorised actors can:
+\subsection{What is security?}
+The state of being secure
+\\CIA: \textbf{only} authorised actors can:
+\begin{itemize}
+    \item Learn secrets (\textbf{Confidentiality})
     \begin{itemize}
-        \item Learn secrets (\textbf{Confidentiality})
-        \begin{itemize}
-            \item \textbf{Data Confidentiality}: make sure that private information is not available to unauthorised actors
-            \item \textbf{Privacy}: Individuals have control over what information is collected and stored, and how that information is shared
-        \end{itemize}
-        \item Modify messages/data (\textbf{Integrity})
-        \begin{itemize}
-            \item \textbf{Data Integrity}: Assures that information is modified only in a way that is known
-            \item \textbf{System Integrity}: Ensures that a system performs as designed, without unauthorised modification
-        \end{itemize}
-        \item Access messages/data (\textbf{Availability})
-        \begin{itemize}
-            \item \textbf{Availability}: ensures that service is provided to an acceptable level, without denying access to authorised users
-        \end{itemize}
+        \item \textbf{Data Confidentiality}: make sure that private information is not available to unauthorised actors
+        \item \textbf{Privacy}: Individuals have control over what information is collected and stored, and how that information is shared
     \end{itemize}
-    Security is best \textbf{by design} - not as afterthought
-    \subsection{Identifying requirements for a secure protocol}
+    \item Modify messages/data (\textbf{Integrity})
     \begin{itemize}
-        \item Always work towards CIA protocols described above
-        \item We can do this by using the following three techniques
-        \begin{itemize}
-            \item Cryptographic algorithms to hide, sign and provide guarantees about messages
-            \item Use cryptography in protocols, systems in order to secure them
-            \item Program with security in mind in order to avoid exploits that may manipulate software
-        \end{itemize}
-        \item An additional requirement is \textbf{Non-repudiation}: One party of a transaction cannot deny having received a transaction, nor can the other party deny having sent the transaction.
+        \item \textbf{Data Integrity}: Assures that information is modified only in a way that is known
+        \item \textbf{System Integrity}: Ensures that a system performs as designed, without unauthorised modification
     \end{itemize}
-    Access Control
+    \item Access messages/data (\textbf{Availability})
     \begin{itemize}
-        \item \textbf{Identification}: A user states their identity (i.e. a username)
-        \item \textbf{Authentication}: The system verifies this identity (i.e. through a shared secret like a password)
-        \item \textbf{Authorisation}: This user is authorised to perform a particular task, or access a particular file
-        \end{itemize}
+        \item \textbf{Availability}: ensures that service is provided to an acceptable level, without denying access to authorised users
+    \end{itemize}
+\end{itemize}
+Security is best \textbf{by design} - not as afterthought
+\subsection{Identifying requirements for a secure protocol}
+\begin{itemize}
+    \item Always work towards CIA protocols described above
+    \item We can do this by using the following three techniques
+    \begin{itemize}
+        \item Cryptographic algorithms to hide, sign and provide guarantees about messages
+        \item Use cryptography in protocols, systems in order to secure them
+        \item Program with security in mind in order to avoid exploits that may manipulate software
+    \end{itemize}
+    \item An additional requirement is \textbf{Non-repudiation}: One party of a transaction cannot deny having received a transaction, nor can the other party deny having sent the transaction.
+\end{itemize}
+Access Control
+\begin{itemize}
+    \item \textbf{Identification}: A user states their identity (i.e. a username)
+    \item \textbf{Authentication}: The system verifies this identity (i.e. through a shared secret like a password)
+    \item \textbf{Authorisation}: This user is authorised to perform a particular task, or access a particular file
+\end{itemize}
 \section{Cryptology}
 Cryptography: The mathematics of secret communication
 \\Cryptology: Includes study of breaking cryptographic protocols (known as cryptanalysis)
@@ -138,19 +138,19 @@ Typically injective (one-to-one) to allow for decryption
 \subsubsection{Transposition cipher}
 Permutation over a block of plaintext.
 \begin{verbatim}
-    Key:        4312567
-    Plaintext:  attackp
-                ostpone
-                duntilt
-                woamxyz
+Key:        4312567
+Plaintext:  attackp
+ostpone
+duntilt
+woamxyz
 \end{verbatim}
 If you read the characters column-wise in the order provided by the key, you get the following message:
 \begin{verbatim}
-    ttna aptm tsuo aodw coix knly petz
+ttna aptm tsuo aodw coix knly petz
 \end{verbatim}
 Putting this together, we get the nonsense string:
 \begin{verbatim}
-    ttnaaptmtsuoaodwcoixknlypetz
+ttnaaptmtsuoaodwcoixknlypetz
 \end{verbatim}
 \subsubsection{Feistel Cipher}
 \begin{itemize}
@@ -495,8 +495,96 @@ SSH uses several crypto primitives:
     \item public-key based (recommended!)
     \begin{itemize}
         \item user sends public key to server
-        \item it is saved in ~/.ssh/authorised_keys file serverside
+        \item it is saved in \~/.ssh/authorised_keys file serverside
         \item now user can log in without password, using their private key to authenticate
     \end{itemize}
 \end{itemize}
+\section{Introduction to Secure Sockets Layer (SSL)}
+\subsection{Problems in web security}
+\begin{itemize}
+    \item Confidentiality
+    \begin{itemize}
+        \item eavesdropping on connections
+        \item theft of info from server or client
+        \item solution: \textbf{encryption}
+    \end{itemize}
+    \item Integrity
+    \begin{itemize}
+        \item modification of user data
+        \item trojan horse browser
+        \item modification of memory
+        \item modification of message traffic in transit
+        \item solution: \textbf{cryptographic checksums}
+    \end{itemize}
+    \item Authentication
+    \begin{itemize}
+        \item Impersonation of users
+        \item data forgery
+        \item solution: \textbf{cryptographic signatures}
+    \end{itemize}
+    \item Location of the threat:
+    \begin{itemize}
+        \item web server
+        \item web browser
+        \item network traffic
+    \end{itemize}
+\end{itemize}
+\subsection{What is SSL?}
+\begin{itemize}
+    \item \textbf{transport layer} security service
+    \item developed by Netscape originally, v3 with public input
+    \item subsequently became internet standard known as TLS (transport layer security)
+    \item uses TCP for reliable service
+    \item has two layers of protocols
+    \begin{enumerate}
+        \item L1: SSL Record Protocol
+        \item L2: Handshake, change cipher, alert
+    \end{enumerate}
+    \item Handshake for session init, record for data transfer, alert for message passing, change cipher for changing crypto method
+\end{itemize}
+%SSL STACK IMAGE HERE
+SSL Connection:
+\begin{itemize}
+    \item transient, p2p communications link associated with 1 SSL \textbf{session}
+    \item Dimensions:
+    \begin{itemize}
+        \item server and client random byte
+        \item server write MAC secret: secret key for MAC
+        \item client write MAC secret: secret key for MAC
+        \item server write key: encryption key
+        \item client write key: encryption key
+        \item init vectors
+        \item sequence numbers for packets
+    \end{itemize}
+\end{itemize}
+SSL Session:
+\begin{itemize}
+    \item association between client and server
+    \item created by handshake protocol
+    \item \textbf{defines} a set of cryptographic parameters
+    \item may be shared by \textbf{multiple} SSL connections
+    \item Dimensions:
+    \begin{itemize}
+        \item session identifier generated by server
+        \item peer certificate (X.509 v3)
+        \item compression method
+        \item cipher specification
+        \item master secret
+        \item is resumable?
+    \end{itemize}
+\end{itemize}
+\subsection{SSL Record Protocol Services}
+\begin{itemize}
+    \item message integrity: using a MAC with a shared secret key, similar to HMAC but with some differences
+    %maybe include code snippet here? lecture9slide11
+    \item confidentiality: use symmetric encryption with a shared secret key defined by handshake protocol
+    \item AES, IDEA, RC2-40, DES-40, DES, 3DES, Fortezza, RC4-40, RC4-128
+    \item message is optionally compressed before encryption
+\end{itemize}
+%include image from lec9slide13
+\subsection{SSL Change Cipher Spec Protocol}
+\begin{itemize}
+    \item one of 3 SSL specific protocols which use the SSL record protocol
+    \item single message consists of just one byte: 1
+    \item causes pending state to become current
 \end{document}
