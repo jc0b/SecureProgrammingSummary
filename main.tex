@@ -449,4 +449,54 @@ several proposals for simple functions, based on XOR of message blocks
         \item fixed size authenticator for some message using either block cipher mode or keyed hash
     \end{itemize}
 \end{itemize}
+\section{Introduction to Secure SHell (SSH)}
+\subsection{What is SSH?}
+\begin{itemize}
+    \item SSH provides secure channel over unsecured network in client-server architecture
+    \item SSH client connects to SSH server
+    \item provides Confidentiality and Integrity, with authentication
+    \item SSH-1 and SSH-2 versions
+\end{itemize}
+\subsection{Overview}
+There are two phases to SSH
+\begin{itemize}
+    \item session key generation
+    \item public-key based authentication (optional)
+\end{itemize}
+SSH uses several crypto primitives:
+\begin{itemize}
+    \item chacha20-poly1305
+    \item aes128-ctr
+    \item aes256-ctr
+    \item aes128-gcm
+    \item aes256-gcm
+    \item aes128-cbc
+    \item aes192-cbc
+    \item aes256-cbc
+    \item 3des-cbc
+    \item Diffie-Hellman key exchange
+    \item HMAC (hashed MAC)
+\end{itemize}
+\subsection{Session Key Generation}
+\begin{enumerate}
+    \item TCP handshake
+    \item SSH handshake begins
+    \item client shares crypto algorithms it can support
+    \item server agrees on one of them
+    \item client and server begin DH key exchange and generate a session key
+    \item each message must contain a MAC to verify packet integrity
+    \begin{itemize}
+        \item this MAC is calculated from the shared secret, the packet seq#, and the actual message contents
+    \end{itemize}
+\end{enumerate}
+\subsection{User authentication}
+\begin{itemize}
+    \item password-based (encrypted with session key)
+    \item public-key based (recommended!)
+    \begin{itemize}
+        \item user sends public key to server
+        \item it is saved in ~/.ssh/authorised_keys file serverside
+        \item now user can log in without password, using their private key to authenticate
+    \end{itemize}
+\end{itemize}
 \end{document}
