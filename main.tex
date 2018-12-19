@@ -1,5 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\graphicspath{{images/}{../images/}}
 
 \title{Secure Programming Summary}
 \author{j.s.burley }
@@ -332,7 +334,7 @@ We can use:
     \item requires uses to know the public-key for the directory
     \item then, users interact with directory to obtain any desired public key in a secure manner. Real time access to the directory is required when keys are needed
 \end{itemize}
-%TODO: insert image here
+\includegraphics[width= 250pt]{pka.png}
 \subsubsection{Public-key certificates}
 \begin{itemize}
     \item allow key exchange without real-time access to PKA
@@ -340,7 +342,7 @@ We can use:
     \item all contents \textbf{signed} by a trusted PKA or Certificate Authority (i.e. Verisign)
     \item Can be verified by anyone who knows that PKA's public key
 \end{itemize}
-%TODO insert image here for PKC
+\includegraphics[width= 250pt]{ca.png}
 \subsubsection{Public-key distribution of secret keys}
 \begin{itemize}
     \item use previous methods to obtain public-key
@@ -426,7 +428,7 @@ Hash functions transform messages of an arbitrary length to a fixed size $h = H(
 \end{itemize}
 \subsection{Simple Hash Functions}
 several proposals for simple functions, based on XOR of message blocks
-\\Message is arranged into \~$\frac{m}{n}$ blocks, where $m$ = message length and $n$ = hash size
+\\Message is arranged into ~$ \frac{m}{n} $ blocks, where $m$ = message length and $n$ = hash size
 \\RXOR (rotate XOR), generally not crypotographically secure
 \subsection{Secure Hash Algorithm (SHA)}
 \begin{itemize}
@@ -434,7 +436,7 @@ several proposals for simple functions, based on XOR of message blocks
     \item revised as SHA-1 in 1995
     \item US standard for use with DSA signature scheme (FIPS 180-1 1995, RFC3174)
     \item based on MD4 but with some differences (produces 160-bit hash values)
-    \iteam SHA-1 is no longer considered secure, SHA2 recommended
+    \item SHA-1 is no longer considered secure, SHA2 recommended
 \end{itemize}
 \subsection{In summary}
 \begin{itemize}
