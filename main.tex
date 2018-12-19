@@ -601,4 +601,33 @@ SSL Session:
     \end{itemize}
     \item compressed and encrypted like all SSL data
 \end{itemize}
+\subsection{SSL Handshake Protocol}
+\begin{itemize}
+    \item allows server and client to: authenticate eachother, negotiate encryption and MAC algorithms and negotiate crypto keys to be used
+    \item comprises of a series of messages in phases
+    \begin{enumerate}
+        \item establish security capabilities
+        \item server authentication and key exchange
+        \item client authentication and key exchange
+        \item finish
+    \end{enumerate}
+\end{itemize}
+Format of these messages
+%insert image here lec9slide17
+\begin{itemize}
+    \item Type (1 byte): indicates one of 10 messages
+    \item Length (3 bytes): the length of the message in bytes
+    \item Content ($\geq0$ bytes)
+\end{itemize}
+\subsection{Transport Layer Security (TLS)}
+IETF standard RFC 2246 similiar to SSLv3, but with minor differences
+\begin{itemize}
+    \item record format version number is different
+    \item uses HMAC for MAC
+    \item a pseudo-random function expands secrets
+    \item has additional alert codes
+    \item some changes in supported ciphers
+    \item changes in cert types and negotiations
+    \item changes in crypto computations and padding strategy
+\end{itemize}
 \end{document}
