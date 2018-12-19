@@ -4,8 +4,8 @@
 \graphicspath{{images/}{../images/}}
 
 \title{Secure Programming Summary}
-\author{j.s.burley }
-\date{November 2018}
+\author{Jacob Burley}
+\date{Block 2 2018}
 
 \begin{document}
 
@@ -832,4 +832,183 @@ The stack grows towards \textbf{lower memory addresses}, with stack pointer \ver
 \end{enumerate}
 \section{Exploitation Techniques in Application Security}
 \subsection{Buffer Overflows}
+\begin{itemize}
+    \item lack of boundary checking is one of most common mistakes in C/C++
+    \item as a result, bufferoverflows are among the most popular attacks, as they can be exploited both locally and remotely and can modify data flow and control flow of application
+    \item recent tools make exploiting buffer overflows easy, if not automatic
+    \item lots of research has been put into developing prevention techniques and detection mechanisms
+\end{itemize}
+\textbf{The buffer overflow attack family}
+\begin{itemize}
+    \item stack-based
+    \begin{itemize}
+        \item shellcode injection
+        \item return into libc
+        \item return-oriented programming (ROP)
+    \end{itemize}
+    \item heap-based overflows
+    \item integer overflows
+    \item user-controlled format strings
+\end{itemize}
+\subsection{Stack-based overflows and shellcode}
+\begin{itemize}
+    \item data copied without checking boundaries
+    \item overflows pre-allocated buffer, overwriting return address, \textbf{normally} causing a segfault
+    \item If correctly crafted, possible to overwrite return address with user-defined value, and possibly jump to user-defined code (i.e. code that invokes a shell)
+    \item the code may be part of the overflowing data, or not, and the code will be executed with the privileges of the running program (which makes system level exploits \textit{really} bad)
+\end{itemize}
+\textbf{Overflowing Functions}
+\begin{itemize}
+    \item \verb|gets()|
+    \item \verb|strcpy(), strcat()|
+    \item \verb|sprintf(), vsprintf(), scanf(), sscanf(), fscanf()|
+    \item and also, some custom input routines
+\end{itemize}
+\subsubsection{Guessing the buffer address}
+\begin{itemize}
+    \item in most cases, the address of the buffer is not known, and has to be very precisely guessed
+    \item we can use a dummy program to roughly guess stack address of a program, and then assuming the same environment and knowing the size of the parameters, we can roughly guess the address of the stack
+    \item also have to guess offset of the buffer w.r.t the stack pointer
+\end{itemize}
+\textbf{NOP Sled:} Use a series of NOPs at the beginning of the overflowing buffer so that the jump does not need to be too precise
+\subsubsection{Return Oriented Programming (ROP)}
+\begin{itemize}
+    \item modern defenses protect against (traditional) stack smashing
+    \item Data Execution Prevention (DEP) prevents executing writable memory, and ASLR (Address Space Layout Randomization) randomises location of memory (stack, heap, libraries etc)
+    \item executables often not position-independent, so we can reuse code from the executable itself by collecting operations (gadgets) that do a small operation followed by a return and chain them all together
+\end{itemize}
+\subsubsection{Overwriting Values on the Stack}
+\begin{itemize}
+    \item Stack-based buffer overflows affecting return address of a function are obvious source of problems
+    \item any reference to an overwritable value can be a vulnerability. Pointers to strings can have their value changed, as well as integers.
+    \item Changing value of saved base pointer in order to force a process to use a function frame chosen by the attacker when returning from a function, with an additional return operation that could jump to a destination selected by the attacker
+    \item change the value of a function pointer
+\end{itemize}
+\subsection{Other Attacks}
+\begin{itemize}
+    \item Longjmp overflows: overflow information in that setjmp() stores to jump to arbitrary code
+    \item Array overflows: exploit code that uses user-provided input as an index in an array, without checking boundaries. Can allow for direct assignment of memory values
+    \item Off-by-one overflows: exploit situations in which only a single byte can be overwritten
+    \item Non-terminated string overflow: if a string under the attackers control is not null-terminated, a subsequent \verb|strcpy()| may cause an overflow. If adjacent buffers are all not null-terminated, strcpy() will copy more than it is intended to and overflow a buffer
+    \item Integer overflows: Exploit inadequate size and/or signedness of integer values (truncation, arithmetic overflow, signedness)
+    \item Dangling Pointers: variables can be overwritten without buffer overflow if they are used after being freed, as the pointer may be kept by the program
+    \item Uninitialized variables: It can be possible to manipulate the contents of uninitialised variables, as C doesn't automatically initialise them. They contain whatever was at that address at the time of creation
+    \item \verb|data| and \verb|bss| overflows: variables and function pointers in data and bss segments can be the target of a buffer overflow attack
+    \item Format string vulnerability: using user-supplied input, it is possible to write arbitrary values to process memory with a carefully crafted format string, as well as leak values from the register/stack using string formatting. Can thus overwrite bytes using an existing pointer, or using an attacker-controlled pointer.
+\end{itemize}
+\subsection{Heap Overflows}
+Heap is area of memory dynamically allocated through the \verb|malloc()| family of functions
+\\Memory allocated on the heap outlasts the function that created it.
+\\Heap grows towards \textbf{higher memory addresses}
+\\Memory management done through in-band control structures, which can be manipulated by heap overflows to execute arbitrary code
+\\Arch/OS dependent
+\\Some attacks depend on library used to manage the heap
+
+\section{Simple Attacks in Application Security}
+\subsection{Application Security}
+\begin{itemize}
+    \item Applications provide services 
+    \begin{itemize}
+        \item Locally
+        \item Remotely
+    \end{itemize}
+    \item Behaviour of an application is determined by
+    \begin{itemize}
+        \item code being executed
+        \item data being processed
+        \item environment in which application runs
+    \end{itemize}
+    \item Attacks force applications to violate system security
+    \begin{itemize}
+        \item violation of integrity
+        \item violation of confidentiality
+        \item violation of availability
+    \end{itemize}
+\end{itemize}
+\subsubsection{Application Vulnerability Analysis}
+\begin{itemize}
+    \item Identifying vulnerabilities in applications
+    \item Deployment vulnerabilities, i.e:
+    \begin{itemize}
+        \item Installed with unnecessary privileges
+        \item faulty security policies (i.e. a file that only needs to be read is also writable)
+    \end{itemize}
+    \item Implementation vulnerabilities
+    \begin{itemize}
+        \item unexpected input
+        \item unexpected errors/exceptions
+        \item unexpected interleaving of events
+    \end{itemize}
+\end{itemize}
+\subsubsection{Local and Remote Attacks}
+\begin{itemize}
+    \item \textbf{Local attacks}
+    \begin{itemize}
+        \item manipulate behaviour of an application through local interaction
+        \begin{itemize}
+            \item requires a previously established presence on host (e.g. an account or existing malware deployed)
+        \end{itemize}
+        \item allow one to execute operations with privileges that are different (usually superior) than what an attacker would otherwise have
+        \item are easier to perform, because attacker has better knowledge of host environment
+    \end{itemize}
+    Each process in Unix has three UID/GID pairs. Real IDs for the user who started/owns process, Effective IDs (whose permissions should we check), and Saved IDs (used to regian previously dropped privileges). The SUID bit can set the effective UID/GID to the program files owner when executed. Most \textbf{local} vulnerabilities exploit SUID-root programs to gain root privileges, and from there can target the OS itself.
+    \item \textbf{Remote attacks}
+    \begin{itemize}
+        \item manipulate behaviour of an application through network-based interaction
+        \begin{itemize}
+            \item unauthenticated remote attacks: interaction with application does not require authentication of prior capabilities 
+        \end{itemize}
+        \item Allow one to execute operations with privileges of vulnerable application
+        \item are more difficult to perform but also more powerful, as they do not require prior access to the system
+    \end{itemize}
+\end{itemize}
+\subsection{Simple Attacks}
+\begin{itemize}
+    \item environment attacks
+    \item input arguments attacks
+    \item file access attacks
+    \begin{itemize}
+        \item race condition attacks
+        \item file descriptor attacks
+    \end{itemize}
+\end{itemize}
+\textbf{Invoking external programs}
+\begin{itemize}
+    \item applications invoke external commands to carry out specific tasks
+    \item execution of these external commands can be influenced by the environment
+    \item HOME and PATH variables in the environment can be modified to change the behaviour of these external commands/ cause them to execute other commands
+\end{itemize}
+\textbf{Playing with command line parameters}
+Often used by applications without size checking or sanitation
+\\User provided data can be used to perform:
+\begin{itemize}
+    \item command injections (; attack)
+    \item unexpected options to commands
+    \item directory traversal attacks (.. attack)
+\end{itemize}
+Command line params should always be checked for length/size if copied into local buffers, and should \textbf{always} be sanitized. 
+\\In general, escape possibly dangerous input. Instead of denying things that aren't allowed, decide what \textbf{is} allowed and deny \textbf{everything} else.
+\\Also applies to web based input, SQL etc.
+\textbf{Playing with the file system}
+many applications create/use temporary files for logging, locking. Some do not test whether the file already exists, or whether the file is actually a symlink. An attacker could create a symbolic link to a file accessible only to a superuser and then invokes the application.
+\textbf{Time Of Check To Time Of Use (TOCTTOU attack)}
+Attacker may race against application by exploiting the gap between testing and accessing the file
+\begin{itemize}
+    \item Time-Of-Check ($t_1$): validity of assumption A on entity E is checked
+    \item Time-Of-Use ($t_2$): E is used, assuming A is still valid
+    \item Time-Of-Attack ($t_3$): assumption A is invalidated
+    \item $t_1 < t_3 < t_2$
+\end{itemize}
+Data race condition: conflicting accesses of multiple processes to shared data, with at least one of them being a write access.
+
+\subsection{To summarise}
+\begin{itemize}
+    \item verify/validate assumptions made about file system
+    \item Use truly random filenames
+    \item Preventing TOCTTOU race conditions
+    \begin{itemize}
+        \item Use versions of system calls that use file descriptors instead of file path names
+        \item Perform file descriptor binding first
+    \end{itemize}
+\end{itemize}
 \end{document}
