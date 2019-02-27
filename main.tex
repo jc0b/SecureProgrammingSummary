@@ -1213,8 +1213,63 @@ An attacker may want to steal your session cookie so they can hijack your login 
     \item Server-side defenses
     \begin{itemize}
         \item Input Validation
-        \item Output Filtering
+        \begin{itemize}
+            \item Check application inputs are "valid", e.g. that things like request parameters and header data are correctly formed and legal
+            \item We assume that well-formed data should not contain attacks, meaning we can quickly filter what we need to validate and what we can drop straight away
+            \item It's difficult to ensure that valid == safe, as a lot can happen between the check and the modification of the document
+        \end{itemize}
+        \item Output Filtering/Sanitization
+        \begin{itemize}
+            \item Alternatively, we can sanitize the untrusted data as we add it to the document
+            \item We can do this by removing or encoding special characters like '<' or '>'
+            \item This makes it easier to achieve a strong guarantee that script can't be injected into a document, but it can be difficult to specify the sanitization policy (i.e. the coverage, or included exceptions)
+            \item We should also take the document context into account
+            \item This all requires a robust browser model
     \end{itemize}
 \end{itemize}
 
+\textbf{Response Splitting}
+\begin{itemize}
+    \item Attack against integrity of server responses
+    \begin{itemize}
+        \item Similiar to (but not the same as) XSS
+    \end{itemize}
+    \item Simplest example is redirect splitting, which apps are vulnerable to when they don't filter delimiters from \textbf{untrusted} inputs that appear in location headers
+\end{itemize}
+
+\subsubsection{Cross-Site Request Forgery (CSRF)}
+CSRF is another kind of basic web attack
+\begin{itemize}
+    \item Attacker tricks victim into accessing URL that performs an unauthorised action, avoiding the need to read the private state (i.e. user cookies)
+    \item This abuses the Same Origin Policy, as all requests to a location \textit{D} will include \textit{D}'s cookies, even if some other origin \textit{E} is sending the request to \textit{D*}.
+\end{itemize}
+\textbf{Login CSRF}
+\begin{itemize}
+    \item Special form of a more general case
+    \item CSRF can be used on a login form to log the victim in as the attacker
+    \item The attacker can then later access that account and see what the victim did in the account (i.e. what items they looked at, search history etc)
+\end{itemize}
+
+\textbf{How do we prevent CSRF attacks?}
+There are two main ways to defend against CSRF
+\begin{enumerate}
+    \item Referer Checking
+        \begin{itemize}
+            \item Uses the Referer HTTP header, which is automatically added to all requests by the browser
+            \item We can then check what the origin of a request is, which can help verify that there is noone hijacking our login for example.
+            \item This can lead to false positives though, and shouldn't be considered a perfect solution.
+            \item Strict: only accept POST if referer is present \textbf{and} also is the expected value
+            \item Lenient: only accept POST if referer is absent \textbf{or} expected value (so if it is \textbf{NOT} something unexpected)
+            \item Referer header can leak information from your browser to a website, i.e. parts of your browsing history if those links lead to that site
+        \end{itemize}
+    \item CSRF Tokens
+        \begin{itemize}
+            \item Insert random tokens into all forms on the server side
+            \item Token values being unguessable implies that they are also unforgeable
+            \item SOP can prevent an attacker from downloading the target form using code in your browser
+            \item POST responses to forms must include the corresponding random token or they will be dropped
+            \item An attacker could use a proxy to insert and check tokens to try and get the correct one
+        \end{itemize}
+\end{enumerate}
+CSRF is a classic example of a confused deputy attack, where an app is tricked into doing something it \textbf{shouldn't} do, even though it possesses the authority to do it.
 \end{document}
